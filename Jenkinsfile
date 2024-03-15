@@ -1,28 +1,24 @@
 pipeline {
-    agent {
-        docker {
-            image "openjdk:11"
-        }
-    }
-
+    agent any
     stages {
         stage("Sonar Quality Check") {
+            agent {
+                docker {
+                    image "openjdk:11"
+                }
+            }
             steps {
                 script {
-                    try {
-                        withSonarQubeEnv(credentialsId: 'sonar-token') {
-                            sh 'chmod +x gradlew'
-                            sh './gradlew sonarqube'
-                        }
-                    } catch (Exception e) {
-                        echo "SonarQube analysis failed: ${e.message}"
-                        currentBuild.result = 'FAILURE'
+                    withSonarQubeEnv(credentialsId: 'sonar-token') {
+                        sh 'chmod +x gradlew'
+                        sh './gradlew sonarqube --info'
                     }
                 }
             }
-        }    
+        }
     }
 }
+
 
 
 
